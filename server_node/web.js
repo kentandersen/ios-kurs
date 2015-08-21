@@ -16,28 +16,35 @@ app.configure(function(){
 });
 
 app.configure('development', function(){
-  app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
+  app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
 });
 
 app.configure('production', function(){
-  app.use(express.errorHandler()); 
+  app.use(express.errorHandler());
 });
+
 
 var connectUrl = process.env.MONGOHQ_URL || 'mongodb://localhost/iosCourse'
 mongoose.connect(connectUrl);
 
 var MessageSchema = new mongoose.Schema({
   from: {
-    type: String
+    type: String,
+    validate: function (from) {
+      return from && from.indexOf("<") === -1 && from.trim() !== "";
+    }
   },
   message: {
-    type: String 
+    type: String,
+    validate: function(message){
+      return message && message.indexOf("<") === -1 && message.trim() !== "";
+    }
   },
   date: {
     type: Date,
     "default": Date.now,
     validate: function(date){
-      return Date.now() > date;
+      return Date.now()+60000 > date;
     }
   }
 });
